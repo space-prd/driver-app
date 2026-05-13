@@ -14,6 +14,7 @@ import {
 } from '../storage';
 import type { Car, CompletedTrip, Driver, OpenedTrip } from '../types';
 import { formatDate, formatDateThai } from '../utils';
+import { postTripWebhook } from '../lib/webhook';
 
 type ToastKind = 'info' | 'error';
 
@@ -109,7 +110,16 @@ export default function TripPage() {
       setActiveTrip(null);
       setHistory((prev) => [completed, ...prev]);
       setNextRound((n) => n + 1);
-      showToast('ปิดงานเรียบร้อย ขอบคุณครับ');
+
+      // Fire webhook AFTER DB write succeeds. If the webhook fails, the trip
+      // is still saved in Supabase — we just warn the user separately.
+      try {
+        await postTripWebhook(completed, car);
+        showToast('ปิดงานเรียบร้อย ขอบคุณครับ');
+      } catch (whErr) {
+        console.error('[webhook] post failed:', whErr);
+        showToast('ปิดงานสำเร็จ แต่แจ้ง Power Automate ไม่สำเร็จ', 'error');
+      }
     } catch (err) {
       showToast(errorMsg(err, 'ปิดงานล้มเหลว'), 'error');
     } finally {
