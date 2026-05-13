@@ -535,6 +535,34 @@ textarea {
 .muted {
   color: var(--text-secondary);
 }
+.history-toggle {
+  /* Stretch to the card edges (card has padding: 20px) */
+  margin: 4px -20px -20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--separator);
+  color: var(--blue);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.history-toggle:active {
+  background: var(--fill-1);
+}
+.history-toggle .chevron {
+  transition: transform 0.2s ease;
+}
+.history-toggle .chevron.up {
+  transform: rotate(180deg);
+}
 
 /* ---------- Toast ---------- */
 .toast {
