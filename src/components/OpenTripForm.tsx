@@ -1,15 +1,23 @@
 import { useState } from 'react';
 import LocationPicker from './LocationPicker';
-import { DRIVERS, type Driver, type OpenedTrip } from '../types';
+import type { Driver, OpenedTrip } from '../types';
 
 interface Props {
   plate: string;
   nextRound: number;
-  onSubmit: (data: Omit<OpenedTrip, 'plate' | 'roundNo' | 'date' | 'startedAt'>) => void;
+  drivers: Driver[];
+  submitting?: boolean;
+  onSubmit: (data: Omit<OpenedTrip, 'id' | 'plate' | 'roundNo' | 'date' | 'startedAt'>) => void;
 }
 
-export default function OpenTripForm({ plate, nextRound, onSubmit }: Props) {
-  const [driver, setDriver] = useState<Driver | ''>('');
+export default function OpenTripForm({
+  plate,
+  nextRound,
+  drivers,
+  submitting = false,
+  onSubmit,
+}: Props) {
+  const [driver, setDriver] = useState('');
   const [origin, setOrigin] = useState('');
   const [originGps, setOriginGps] = useState<{ lat: number; lng: number } | null>(null);
   const [mileage, setMileage] = useState('');
@@ -20,7 +28,7 @@ export default function OpenTripForm({ plate, nextRound, onSubmit }: Props) {
     e.preventDefault();
     if (!canSubmit) return;
     onSubmit({
-      driver: driver as Driver,
+      driver,
       originLocation: origin.trim(),
       originMileage: Number(mileage),
       originGps,
@@ -42,14 +50,15 @@ export default function OpenTripForm({ plate, nextRound, onSubmit }: Props) {
           <select
             className="input select"
             value={driver}
-            onChange={(e) => setDriver(e.target.value as Driver)}
+            onChange={(e) => setDriver(e.target.value)}
+            disabled={drivers.length === 0}
           >
             <option value="" disabled>
-              เลือกคนขับ…
+              {drivers.length === 0 ? 'ยังไม่มีคนขับในระบบ' : 'เลือกคนขับ…'}
             </option>
-            {DRIVERS.map((d) => (
-              <option key={d} value={d}>
-                {d}
+            {drivers.map((d) => (
+              <option key={d.id} value={d.name}>
+                {d.name}
               </option>
             ))}
           </select>
@@ -80,8 +89,12 @@ export default function OpenTripForm({ plate, nextRound, onSubmit }: Props) {
         </div>
       </label>
 
-      <button type="submit" className="btn btn-primary block" disabled={!canSubmit}>
-        เริ่มวิ่งรอบนี้
+      <button
+        type="submit"
+        className="btn btn-primary block"
+        disabled={!canSubmit || submitting}
+      >
+        {submitting ? 'กำลังบันทึก…' : 'เริ่มวิ่งรอบนี้'}
       </button>
     </form>
   );

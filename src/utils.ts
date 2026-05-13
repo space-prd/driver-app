@@ -1,8 +1,16 @@
+/** ISO YYYY-MM-DD for storage / Postgres date column. */
 export function formatDate(d: Date = new Date()): string {
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
   const yyyy = d.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+/** Display helper: YYYY-MM-DD → DD/MM/YYYY. Returns the input as-is if malformed. */
+export function formatDateThai(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return iso;
+  return `${m[3]}/${m[2]}/${m[1]}`;
 }
 
 export function formatTime(d: Date = new Date()): string {

@@ -4,12 +4,13 @@ import type { CompletedTrip } from '../types';
 
 interface Props {
   originMileage: number;
+  submitting?: boolean;
   onSubmit: (
     data: Pick<CompletedTrip, 'destinationLocation' | 'destinationMileage' | 'destinationGps'>,
   ) => void;
 }
 
-export default function CloseTripForm({ originMileage, onSubmit }: Props) {
+export default function CloseTripForm({ originMileage, submitting = false, onSubmit }: Props) {
   const [destination, setDestination] = useState('');
   const [destGps, setDestGps] = useState<{ lat: number; lng: number } | null>(null);
   const [mileage, setMileage] = useState('');
@@ -67,8 +68,12 @@ export default function CloseTripForm({ originMileage, onSubmit }: Props) {
         ) : null}
       </label>
 
-      <button type="submit" className="btn btn-success block" disabled={!canSubmit}>
-        ปิดงาน เสร็จสิ้นรอบนี้
+      <button
+        type="submit"
+        className="btn btn-success block"
+        disabled={!canSubmit || submitting}
+      >
+        {submitting ? 'กำลังบันทึก…' : 'ปิดงาน เสร็จสิ้นรอบนี้'}
       </button>
     </form>
   );
